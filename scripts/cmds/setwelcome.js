@@ -4,7 +4,7 @@ module.exports = {
 	config: {
 		name: "setwelcome",
 		aliases: ["setwc"],
-		version: "1.4",
+		version: "1.6",
 		author: "NTKhang",
 		countDown: 5,
 		role: 1,
@@ -32,7 +32,7 @@ module.exports = {
 					+ "\n\n   Ví dụ:"
 					+ "\n    {pn} file reset: xóa gửi file",
 				attachment: {
-					[__dirname + "/assets/guide/setwelcome/guide1.png"]: "https://i.ibb.co/tp16L1d/guide1.png"
+					[`${__dirname}/assets/guide/setwelcome/setwelcome_vi_1.png`]: "https://i.ibb.co/vd6bQrW/setwelcome-vi-1.png"
 				}
 			},
 			en: {
@@ -49,7 +49,7 @@ module.exports = {
 					+ "\n\n   Example:"
 					+ "\n    {pn} file reset: delete file attachments",
 				attachment: {
-					[__dirname + "/assets/guide/setwelcome_1.png"]: "https://i.ibb.co/tp16L1d/guide1.png"
+					[`${__dirname}/assets/guide/setwelcome/setwelcome_en_1.png`]: "https://i.ibb.co/vsCz0ks/setwelcome-en-1.png"
 				}
 			}
 		}
@@ -156,13 +156,14 @@ async function saveChanges(message, event, threadID, senderID, threadsData, getL
 	if (!data.welcomeAttachment)
 		data.welcomeAttachment = [];
 
-	for (const attachment of attachments) {
+	await Promise.all(attachments.map(async attachment => {
 		const { url } = attachment;
 		const ext = getExtFromUrl(url);
 		const fileName = `${getTime()}.${ext}`;
 		const infoFile = await drive.uploadFile(`setwelcome_${threadID}_${senderID}_${fileName}`, await getStreamFromURL(url));
 		data.welcomeAttachment.push(infoFile.id);
-	}
+	}));
+
 	await threadsData.set(threadID, {
 		data
 	});
